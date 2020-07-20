@@ -20,6 +20,5 @@ func MakeDownloader(method string, URL string, token string, body []byte) (*http
 		return nil, err
 	}
 
-	defer resp.Body.Close()
 	return resp, nil
 }

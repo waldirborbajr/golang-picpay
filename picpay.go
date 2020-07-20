@@ -38,7 +38,7 @@ func (p *Picpay) GetOrderStatus(referenceID string) (*StatusResultJSON, error) {
 	defer resp.Body.Close()
 
 	result := new(StatusResultJSON)
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+	if err := json.NewDecoder(resp.Body).Decode(result); err != nil {
 		return nil, err
 	}
 	return result, nil
@@ -64,7 +64,7 @@ func (p *Picpay) PayOrder(buyer interface{}) (*PaymentResultJSON, error) {
 	defer resp.Body.Close()
 
 	result := new(PaymentResultJSON)
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+	if err := json.NewDecoder(resp.Body).Decode(result); err != nil {
 		return nil, err
 	}
 	return result, nil

@@ -8,7 +8,7 @@ Olá! Este projeto é 100% Opensource e foi desenvolvido online no canal da [Spa
 
 - [x] Obter status de um pedido
 - [x] Realizar pagamentos
-- [ ] Cancelar pagamento
+- [x] Cancelar pagamento
 - [ ] Notificações
 
 ## Instalando

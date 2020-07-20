@@ -35,6 +35,8 @@ func (p *Picpay) GetOrderStatus(referenceID string) (*StatusResultJSON, error) {
 		return nil, err
 	}
 
+	defer resp.Body.Close()
+
 	result := new(StatusResultJSON)
 	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
 		return nil, err
@@ -59,8 +61,37 @@ func (p *Picpay) PayOrder(buyer interface{}) (*PaymentResultJSON, error) {
 		return nil, err
 	}
 
+	defer resp.Body.Close()
+
 	result := new(PaymentResultJSON)
 	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
+func (p *Picpay) CancelOrder(authorizationID, referenceID string) (*CancellationResultJSON, error) {
+	URL, err := url.Parse(p.BaseURL)
+	if err != nil {
+		return nil, err
+	}
+
+	URL.Path = path.Join(URL.Path, referenceID, "/cancellations")
+
+	body, err := json.Marshal(map[string]string{"authorizationId": authorizationID})
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := MakeDownloader(http.MethodPost, URL.String(), p.Token, body)
+	if err != nil {
+		return nil, err
+	}
+
+	defer resp.Body.Close()
+
+	result := new(CancellationResultJSON)
+	if err := json.NewDecoder(resp.Body).Decode(result); err != nil {
 		return nil, err
 	}
 	return result, nil

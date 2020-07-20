@@ -36,7 +36,7 @@ func (p *Picpay) GetOrderStatus(referenceID string) (*StatusResultJSON, error) {
 	}
 
 	result := new(StatusResultJSON)
-	if err := json.Unmarshal(resp, result); err != nil {
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
 		return nil, err
 	}
 	return result, nil
@@ -60,7 +60,7 @@ func (p *Picpay) PayOrder(buyer interface{}) (*PaymentResultJSON, error) {
 	}
 
 	result := new(PaymentResultJSON)
-	if err := json.Unmarshal(resp, result); err != nil {
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
 		return nil, err
 	}
 	return result, nil

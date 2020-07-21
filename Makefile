@@ -1,7 +1,7 @@
 .PHONY: test cover check
 
 test:
-	@go test -v
+	@go test -v ./downloader
 
 check:
 	@revive

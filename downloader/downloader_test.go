@@ -1,4 +1,4 @@
-package picpay
+package downloader
 
 import (
 	"encoding/json"

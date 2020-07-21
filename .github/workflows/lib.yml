@@ -1,4 +1,4 @@
-name: Go
+name: Golang Picpay
 
 on:
   push:
@@ -28,4 +28,6 @@ jobs:
 
     - name: Testing Library
       run: make test
-  
+    
+    - name: Check Formmat Code
+      run: make check

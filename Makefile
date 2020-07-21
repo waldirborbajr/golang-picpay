@@ -1,7 +1,10 @@
-.PHONY: test cover
+.PHONY: test cover check
 
 test:
 	@go test -v
+
+check:
+	@revive
 
 cover:
 	@go test -coverprofile=coverage.out

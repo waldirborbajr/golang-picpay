@@ -1,7 +1,6 @@
 package response
 
-// revive:disable
-
+// PaymentResponse deliver the result of the request made by PayOrder
 type PaymentResponse struct {
 	ReferenceID string `json:"referenceId"`
 	PaymentURL  string `json:"paymentUrl"`

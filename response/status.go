@@ -1,7 +1,6 @@
 package response
 
-// revive:disable
-
+// StatusResponse deliver the result of the request made by GetOrderStatus
 type StatusResponse struct {
 	AuthorizationID string `json:"authorizationId"`
 	ReferenceID     string `json:"referenceId"`

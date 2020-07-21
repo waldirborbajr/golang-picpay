@@ -2,42 +2,46 @@ package picpay
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"net/url"
 	"path"
+
+	"github.com/marcuxyz/golang-picpay/downloader"
+	"github.com/marcuxyz/golang-picpay/response"
 )
 
-// Picpay is a struct
-// This object must not be instantiated manually, for this use the New() function
+// Picpay base
 type Picpay struct {
-	Token   string
-	BaseURL string
+	Token string
+	URL   *url.URL
 }
 
 // New Initializes an instance of the picpay object
 func New(token string) *Picpay {
+	URL, err := url.Parse("https://appws.picpay.com/ecommerce/public/payments/")
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	return &Picpay{
-		Token:   token,
-		BaseURL: "https://appws.picpay.com/ecommerce/public/payments/",
+		Token: token,
+		URL:   URL,
 	}
 }
 
 // GetOrderStatus get current status of order
-func (p *Picpay) GetOrderStatus(referenceID string) (*StatusResultJSON, error) {
-	URL, err := url.Parse(p.BaseURL)
-	if err != nil {
-		return nil, err
-	}
-	URL.Path = path.Join(URL.Path, referenceID, "/status")
+func (p *Picpay) GetOrderStatus(referenceID string) (*response.StatusResponse, error) {
+	p.URL.Path = path.Join(p.URL.Path, referenceID, "/status")
 
-	resp, err := MakeDownloader(http.MethodGet, URL.String(), p.Token, nil)
+	resp, err := downloader.MakeDownloader(http.MethodGet, p.URL.String(), p.Token, nil)
 	if err != nil {
 		return nil, err
 	}
 
 	defer resp.Body.Close()
 
-	result := new(StatusResultJSON)
+	result := new(response.StatusResponse)
 	if err := json.NewDecoder(resp.Body).Decode(result); err != nil {
 		return nil, err
 	}
@@ -45,52 +49,43 @@ func (p *Picpay) GetOrderStatus(referenceID string) (*StatusResultJSON, error) {
 }
 
 // PayOrder create payment with Picpay
-func (p *Picpay) PayOrder(buyer interface{}) (*PaymentResultJSON, error) {
-	URL, err := url.Parse(p.BaseURL)
-	if err != nil {
-		return nil, err
-	}
-
+func (p *Picpay) PayOrder(buyer interface{}) (*response.PaymentResponse, error) {
 	byte, err := json.Marshal(buyer)
 	if err != nil {
 		return nil, err
 	}
 
-	resp, err := MakeDownloader(http.MethodPost, URL.String(), p.Token, byte)
+	resp, err := downloader.MakeDownloader(http.MethodPost, p.URL.String(), p.Token, byte)
 	if err != nil {
 		return nil, err
 	}
 
 	defer resp.Body.Close()
 
-	result := new(PaymentResultJSON)
+	result := new(response.PaymentResponse)
 	if err := json.NewDecoder(resp.Body).Decode(result); err != nil {
 		return nil, err
 	}
 	return result, nil
 }
 
-func (p *Picpay) CancelOrder(authorizationID, referenceID string) (*CancellationResultJSON, error) {
-	URL, err := url.Parse(p.BaseURL)
-	if err != nil {
-		return nil, err
-	}
-
-	URL.Path = path.Join(URL.Path, referenceID, "/cancellations")
+// CancelOrder cancel an order that has been paid!
+func (p *Picpay) CancelOrder(authorizationID, referenceID string) (*response.CancellationResponse, error) {
+	p.URL.Path = path.Join(p.URL.Path, referenceID, "/cancellations")
 
 	body, err := json.Marshal(map[string]string{"authorizationId": authorizationID})
 	if err != nil {
 		return nil, err
 	}
 
-	resp, err := MakeDownloader(http.MethodPost, URL.String(), p.Token, body)
+	resp, err := downloader.MakeDownloader(http.MethodPost, p.URL.String(), p.Token, body)
 	if err != nil {
 		return nil, err
 	}
 
 	defer resp.Body.Close()
 
-	result := new(CancellationResultJSON)
+	result := new(response.CancellationResponse)
 	if err := json.NewDecoder(resp.Body).Decode(result); err != nil {
 		return nil, err
 	}
